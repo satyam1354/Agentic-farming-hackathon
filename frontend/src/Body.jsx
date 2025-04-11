@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { Bar } from 'react-chartjs-2';
-// import 'chart.js/auto';
+import ReactMarkdown from 'react-markdown';
+
 
 function Body() {
+    const [role, setRole] = useState('Farmer advisor');
+    const [season, setSeason] = useState('Spring Season');
     const [landSize, setLandSize] = useState('');
     const [soilType, setSoilType] = useState('');
     const [preferredCrops, setPreferredCrops] = useState('');
     const [budget, setBudget] = useState('');
+    const [prompt, setPrompt] = useState('');
 
-    const [role, setRole] = useState('Farmer advisor');
     const [output, setOutput] = useState('');
     const [history, setHistory] = useState([]);
 
     const formattedPrompt = `
     You are an AI farmer advisor. Analyze this input:
+    - Season: ${season}
     - Land: ${landSize}
     - Soil: ${soilType}
     - Preferred crops: ${preferredCrops}
     - Budget: ${budget}
+    - and prompt is : ${prompt}
     Recommend suitable crops and resource allocation.
     `;
 
@@ -37,36 +41,47 @@ function Body() {
         }
     };
 
+    function AgentResponse({ output }) {
+        return (
+            <div className="mt-4 p-4 bg-gray-100 rounded shadow border">
+                <h2 className="text-2xl font-bold mb-4">Agent Response</h2>
+                <div className="w-full max-w-none">
+                    <div className="prose max-w-full prose-headings:font-bold prose-li:marker:text-green-600 ">
+                        <ReactMarkdown>{output}</ReactMarkdown>
+                    </div>
+                </div>
+            </div >
+        );
+    }
+
     const fetchHistory = async () => {
         const res = await axios.get('http://localhost:5000/history');
         setHistory(res.data);
     };
 
-    //   const handleSoilUpload = async () => {
-    //     const formData = new FormData();
-    //     formData.append('soilData', soilFile);
-    //     await axios.post('http://localhost:5000/upload-soil', formData);
-    //     alert('Soil data uploaded');
-    //   };
+    const RenderedResponse = ({ response }) => {
+        if (!Array.isArray(response)) {
+            return <div>No valid response</div>;
+        }
+        return (
+            <div className="space-y-8">
+                {response.slice(0, 3).map((entry, index) => (
+                    <div key={index} className="  w-full max-w-none  bg-gray-100 p-4 rounded shadow">
+                        <ReactMarkdown>{entry.output}</ReactMarkdown>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     useEffect(() => {
         fetchHistory();
     }, []);
 
-    const cropData = {
-        labels: ['Wheat', 'Corn', 'Rice', 'Soybean'],
-        datasets: [
-            {
-                label: 'Profitability Index',
-                data: [8, 6, 7, 5],
-                backgroundColor: ['#4ade80', '#60a5fa', '#facc15', '#f87171']
-            }
-        ]
-    };
 
     return (
         <div className="p-4 max-w-xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">🌱 Agentic Farming Assistant</h1>
+            <h1 className="text-2xl font-bold mb-4"> Agentic Farming Assistant</h1>
 
             <select value={role} onChange={(e) => setRole(e.target.value)} className="p-2 border rounded mb-2">
                 <option value="advisor">Farmer Advisor</option>
@@ -74,12 +89,13 @@ function Body() {
                 <option value="weather">Weather Advisor</option>
             </select>
 
-            {/* <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                className="w-full p-2 border rounded"
-                placeholder="Ask something..."
-            /> */}
+            <select value={season} onChange={(e) => setSeason(e.target.value)} className=" mx-4 p-2 border rounded mb-2">
+                <option value="Spring Season">Spring Season</option>
+                <option value="Summer Season">Summer Season</option>
+                <option value="Rainy Season">Rainy Season</option>
+                <option value="Winter Season">Winter Season</option>
+            </select>
+
             <div className="grid grid-cols-1 gap-2 mb-4">
                 <input
                     type="text"
@@ -110,38 +126,28 @@ function Body() {
                     className="p-2 border rounded"
                 />
             </div>
+            <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className="w-full p-2 border rounded"
+                placeholder="Add specific details to Agent..."
+            />
 
             <button onClick={askAgent} className="mt-2 px-4 py-2 bg-green-600 text-white rounded cursor-pointer">Ask Agent</button>
 
-            {/* <div className="mt-4">
-        <input type="file" onChange={(e) => setSoilFile(e.target.files[0])} />
-        <button
-          onClick={handleSoilUpload}
-          className="ml-2 px-4 py-2 bg-blue-600 text-white rounded"
-        >Upload Soil Data</button>
-      </div> */}
 
-            <div className="mt-6">
-                <h2 className="text-lg font-semibold">🧠 Agent Response</h2>
-                <p className="mt-2 border p-2 rounded bg-gray-100">{output}</p>
+            <div>
+                {output && <AgentResponse output={output} />}
             </div>
 
-            {/* <div className="mt-6">
-        <h2 className="text-lg font-semibold">📊 Crop Suggestions</h2>
-        <Bar data={cropData} />
-      </div> */}
 
             <div className="mt-6">
-                <h2 className="text-lg font-semibold">📜 Recent Logs</h2>
+                <h2 className="text-2xl font-semibold"> Recent Logs</h2>
                 <ul className="mt-2">
-                    {history.map(log => (
-                        <li key={log.id} className="mb-2 p-2 border rounded bg-white">
-                            <strong>{log.role}:</strong> {log.input}<br />
-                            <em>→ {log.output}</em>
-                        </li>
-                    ))}
+                    {history.length > 0 && <RenderedResponse response={history} />}
                 </ul>
             </div>
+
         </div>
     );
 }

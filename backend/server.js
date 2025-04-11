@@ -27,7 +27,7 @@ db.run(`CREATE TABLE IF NOT EXISTS agent_logs (
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
-// Route to interact with Ollama and log interaction
+// routes to interact with ollama and logging interaction
 app.post('/ask-agent', async (req, res) => {
     console.log(req.body)
   const { role, prompt } = req.body;
@@ -55,7 +55,7 @@ app.post('/ask-agent', async (req, res) => {
 });
 
 app.get('/history', (req, res) => {
-  db.all('SELECT * FROM agent_logs ORDER BY timestamp DESC LIMIT 20', [], (err, rows) => {
+  db.all('SELECT * FROM agent_logs ORDER BY timestamp DESC LIMIT 3', [], (err, rows) => {
     if (err) {
       return res.status(500).json({ error: 'Failed to fetch history' });
     }
