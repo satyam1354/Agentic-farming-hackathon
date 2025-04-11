@@ -1,11 +1,11 @@
-import Body from "./body"
+import Template from "./Template"
 
 function App() {
 
   return (
     <>
       <div>
-        <Body/>
+        <Template/>
       </div>
     </>
   )

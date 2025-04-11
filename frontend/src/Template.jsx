@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
 
-function Body() {
+function Template() {
     const [role, setRole] = useState('Farmer advisor');
     const [season, setSeason] = useState('Spring Season');
     const [landSize, setLandSize] = useState('');
@@ -55,7 +55,8 @@ function Body() {
         );
     }
 
-    const fetchHistory = async () => { `${baseURL}/history`
+    const fetchHistory = async () => {
+        `${baseURL}/history`
         const res = await axios.get(`${baseURL}/history`);
         setHistory(res.data);
     };
@@ -153,4 +154,4 @@ function Body() {
     );
 }
 
-export default Body;
+export default Template;
