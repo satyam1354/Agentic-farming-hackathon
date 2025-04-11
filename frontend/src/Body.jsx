@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+const baseURL = process.env.REACT_APP_BACKEND_URL;
 
 
 function Body() {
@@ -28,7 +29,7 @@ function Body() {
 
     const askAgent = async () => {
         try {
-            const res = await axios.post('http://localhost:5000/ask-agent', {
+            const res = await axios.post(`${baseURL}/ask-agent`, {
                 role,
                 prompt: formattedPrompt
             });
@@ -54,8 +55,8 @@ function Body() {
         );
     }
 
-    const fetchHistory = async () => {
-        const res = await axios.get('http://localhost:5000/history');
+    const fetchHistory = async () => { `${baseURL}/history`
+        const res = await axios.get(`${baseURL}/history`);
         setHistory(res.data);
     };
 
