@@ -15,6 +15,9 @@ function Template() {
 
     const [output, setOutput] = useState('');
     const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
 
     const formattedPrompt = `
     You are an AI farmer advisor. Analyze this input:
@@ -28,6 +31,8 @@ function Template() {
     `;
 
     const askAgent = async () => {
+        setLoading(true)
+        setError('')
         try {
             const res = await axios.post(`${baseURL}/ask-agent`, {
                 role,
@@ -38,7 +43,10 @@ function Template() {
             fetchHistory();
         } catch (err) {
             console.log(err?.response?.data?.message)
+            setError("Error to connect to agent")
             alert('Error talking to agent');
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -135,10 +143,12 @@ function Template() {
                 placeholder="Add specific details to Agent..."
             />
 
-            <button onClick={askAgent} className="mt-2 px-4 py-2 bg-green-600 text-white rounded cursor-pointer">Ask Agent</button>
+            <button onClick={askAgent} className="mt-2 px-4 py-2 bg-green-600 text-white rounded cursor-pointer"> {loading ? 'Asking...' : 'Ask Agent'}</button>
 
 
             <div>
+                {loading && <p className="text-blue-600">Talking to agent...</p>}
+                {error && <p className="text-red-600">{error}</p>}
                 {output && <AgentResponse output={output} />}
             </div>
 
