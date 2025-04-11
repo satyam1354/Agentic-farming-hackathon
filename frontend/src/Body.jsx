@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-const baseURL = process.env.REACT_APP_BACKEND_URL;
+const baseURL = import.meta.env.VITE_BACKEND_URL;
 
 
 function Body() {
