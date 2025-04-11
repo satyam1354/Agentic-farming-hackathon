@@ -1,17 +1,18 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -33,7 +34,7 @@ app.post('/ask-agent', async (req, res) => {
   const { role, prompt } = req.body;
 
   try {
-    const ollamaRes = await axios.post('http://localhost:11434/api/generate', {
+    const ollamaRes = await axios.post(`${process.env.OLLAMA_URL || 'http://localhost:11434'}/api/generate`, {
       model: 'gemma3:4b',
       prompt,
       stream: false
@@ -50,7 +51,7 @@ app.post('/ask-agent', async (req, res) => {
     res.json({ output, success: true });
   } catch (err) {
     console.error('Ollama Error:', err.response?.data || err.message || err);
-    res.status(500).json({ error: 'Ollama interaction failed' });
+    res.status(500).json({ error: 'Ollama interaction failed' , details: err.message});
   }
 });
 

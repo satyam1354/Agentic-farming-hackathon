@@ -64,7 +64,7 @@ function Template() {
     }
 
     const fetchHistory = async () => {
-        `${baseURL}/history`
+
         const res = await axios.get(`${baseURL}/history`);
         setHistory(res.data);
     };
